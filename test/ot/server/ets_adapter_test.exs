@@ -27,7 +27,7 @@ defmodule OT.Server.ETSAdapterTest do
     ETSAdapter.insert_operation(%{id: "id2"}, {[:op_2_2], 2}, nil)
 
     assert ETSAdapter.get_conflicting_operations(%{id: "id"}, 1) ==
-      [{[:op_1], 1}, {[:op_2], 2}]
+             [{[:op_1], 1}, {[:op_2], 2}]
   end
 
   test ".get_datum fetches the datum" do
@@ -42,12 +42,12 @@ defmodule OT.Server.ETSAdapterTest do
 
   test ".handle_submit_error returns a retry for a version mismatch" do
     assert ETSAdapter.handle_submit_error({:error, :version_mismatch}, nil, nil) ==
-      :retry
+             :retry
   end
 
   test ".handle_submit_error returns the error for a non-version mismatch" do
     assert ETSAdapter.handle_submit_error({:error, :not_found}, nil, nil) ==
-      {:error, :not_found}
+             {:error, :not_found}
   end
 
   test ".insert_operation inserts the operation of it is valid" do
@@ -57,16 +57,17 @@ defmodule OT.Server.ETSAdapterTest do
 
   test ".insert_operation returns an error for a version mismatch" do
     ETSAdapter.insert_operation(%{id: "id"}, {[1], 1}, nil)
+
     assert ETSAdapter.insert_operation(%{id: "id"}, {[1], 1}, nil) ==
-      {:error, :version_mismatch}
+             {:error, :version_mismatch}
   end
 
   test ".update_datum updates the datum" do
     datum = %{id: "id", content: "A", version: 0}
     :ets.insert(:ot_data, {datum[:id], datum})
-    {:ok, %{id: "id", content: "B", version: 1}} =
-      ETSAdapter.update_datum(datum, "B")
+    {:ok, %{id: "id", content: "B", version: 1}} = ETSAdapter.update_datum(datum, "B")
+
     assert ETSAdapter.get_datum("id") ==
-      {:ok, %{id: "id", content: "B", version: 1}}
+             {:ok, %{id: "id", content: "B", version: 1}}
   end
 end

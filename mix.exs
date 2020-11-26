@@ -11,8 +11,8 @@ defmodule OT.Server.Mixfile do
       description: description(),
       package: package(),
       elixir: "~> 1.4",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
 
       # Docs
@@ -41,15 +41,21 @@ defmodule OT.Server.Mixfile do
   end
 
   defp package do
-    [maintainers: ["Jonathan Clem <jonathan@jclem.net>"],
-     licenses: ["ISC"],
-     links: %{"GitHub" => @github_url}]
+    [
+      maintainers: ["Jonathan Clem <jonathan@jclem.net>"],
+      licenses: ["ISC"],
+      links: %{"GitHub" => @github_url}
+    ]
   end
 
   defp docs do
-    [source_ref: "v#{@version}",
-     main: "README.md",
-     extras: ["README.md": [filename: "README.md", title: "Readme"],
-              "LICENSE.md": [filename: "LICENSE.md", title: "License"]]]
+    [
+      source_ref: "v#{@version}",
+      main: "README.md",
+      extras: [
+        "README.md": [filename: "README.md", title: "Readme"],
+        "LICENSE.md": [filename: "LICENSE.md", title: "License"]
+      ]
+    ]
   end
 end

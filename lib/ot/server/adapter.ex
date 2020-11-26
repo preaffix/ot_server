@@ -17,7 +17,7 @@ defmodule OT.Server.Adapter do
   operation is processed at a time per document, a requirement of this OT
   system.
   """
-  @callback transact(id :: Server.datum_id, (() -> any)) :: {:ok, any} | {:error, any}
+  @callback transact(id :: Server.datum_id(), (() -> any)) :: {:ok, any} | {:error, any}
 
   @doc """
   Roll a transaction back.
@@ -32,7 +32,7 @@ defmodule OT.Server.Adapter do
   @doc """
   Get the datum identified by the ID.
   """
-  @callback get_datum(id :: Server.datum_id) :: {:ok, Server.datum} | {:error, any}
+  @callback get_datum(id :: Server.datum_id()) :: {:ok, Server.datum()} | {:error, any}
 
   @doc """
   Get any conflicting operations for the given datum at the given version.
@@ -42,14 +42,14 @@ defmodule OT.Server.Adapter do
 
   The function must return a list of `t:OT.Server.operation_info/0`s.
   """
-  @callback get_conflicting_operations(datum :: Server.datum, Server.version)
-    :: [Server.operation_info]
+  @callback get_conflicting_operations(datum :: Server.datum(), Server.version()) ::
+              [Server.operation_info()]
 
   @doc """
   Update the `t:OT.Server.datum/0` with the given content and increment its
   `t:OT.Server.version/0`.
   """
-  @callback update_datum(datum :: Server.datum, any) :: {:ok, Server.datum} | {:error, any}
+  @callback update_datum(datum :: Server.datum(), any) :: {:ok, Server.datum()} | {:error, any}
 
   @doc """
   Insert the given `t:OT.Server.operation/0` into persistence.
@@ -60,7 +60,8 @@ defmodule OT.Server.Adapter do
   On a successful submission, this value is what will be returned from
   `OT.Server.submit_operation/3`.
   """
-  @callback insert_operation(datum :: Server.datum, Server.operation_info, any) :: {:ok, any} | {:error, any}
+  @callback insert_operation(datum :: Server.datum(), Server.operation_info(), any) ::
+              {:ok, any} | {:error, any}
 
   @doc """
   Handle a submission error.
@@ -69,5 +70,5 @@ defmodule OT.Server.Adapter do
   submission should be tried again, return `:retry`. Otherwise, return a tagged
   error tuple and the call to `OT.Server.submit_operation/3` will fail.
   """
-  @callback handle_submit_error(any, any, Server.operation_info) :: :retry | {:error, any}
+  @callback handle_submit_error(any, any, Server.operation_info()) :: :retry | {:error, any}
 end

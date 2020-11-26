@@ -50,11 +50,13 @@ defmodule OT.Server.ETSAdapter do
     #     :ets.fun2ms(fn {{^id, vsn}, op} when vsn >= op_vsn ->
     #       {op, vsn}
     #     end)
-    match_spec = [{
-      {{:"$1", :"$2"}, :"$3"},
-      [{:>=, :"$2", {:const, op_vsn}}, {:"=:=", {:const, id}, :"$1"}],
-      [{{:"$3", :"$2"}}]
-    }]
+    match_spec = [
+      {
+        {{:"$1", :"$2"}, :"$3"},
+        [{:>=, :"$2", {:const, op_vsn}}, {:"=:=", {:const, id}, :"$1"}],
+        [{{:"$3", :"$2"}}]
+      }
+    ]
 
     :ets.select(@ops_table, match_spec)
   end

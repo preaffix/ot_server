@@ -9,8 +9,8 @@ defmodule OT.Server.Impl do
   @doc """
   Get a datum using the configured `OT.Server.Adapter`.
   """
-  @spec get_datum(OT.Server.datum_id) ::
-    {:ok, OT.Server.datum} | {:error, any}
+  @spec get_datum(OT.Server.datum_id()) ::
+          {:ok, OT.Server.datum()} | {:error, any}
   def get_datum(id) do
     @adapter.get_datum(id)
   end
@@ -19,9 +19,8 @@ defmodule OT.Server.Impl do
   Submit an operation using the configured `OT.Server.Adapter`, transforming it
   against concurrent operations, if necessary.
   """
-  @spec submit_operation(OT.Server.datum_id,
-    OT.Server.operation_info, any, non_neg_integer) ::
-    {:ok, OT.Server.operation} | {:error, any}
+  @spec submit_operation(OT.Server.datum_id(), OT.Server.operation_info(), any, non_neg_integer) ::
+          {:ok, OT.Server.operation()} | {:error, any}
   def submit_operation(datum_id, op_vsn, op_meta, retries \\ 0)
 
   def submit_operation(_, _, _, retries) when retries > @max_retries do
@@ -40,6 +39,7 @@ defmodule OT.Server.Impl do
     case txn_result do
       {:ok, new_op} ->
         {:ok, new_op}
+
       {:error, err} ->
         case @adapter.handle_submit_error(err, datum_id, {op, vsn}) do
           :retry -> submit_operation(datum_id, {op, vsn}, retries + 1)
@@ -50,9 +50,9 @@ defmodule OT.Server.Impl do
 
   defp attempt_submit_operation(datum_id, {op, vsn}, op_meta) do
     with {:ok, datum} <- @adapter.get_datum(datum_id),
-         {:ok, type}  <- lookup_type(Map.get(datum, :type)),
-         {:ok, vsn}   <- check_datum_version(Map.get(datum, :version), vsn),
-         {op, vsn}    = get_new_operation(datum, {op, vsn}, type),
+         {:ok, type} <- lookup_type(Map.get(datum, :type)),
+         {:ok, vsn} <- check_datum_version(Map.get(datum, :version), vsn),
+         {op, vsn} = get_new_operation(datum, {op, vsn}, type),
          {:ok, datum} <- update_datum(datum, op, type) do
       @adapter.insert_operation(datum, {op, vsn}, op_meta)
     end
@@ -77,10 +77,11 @@ defmodule OT.Server.Impl do
     case @adapter.get_conflicting_operations(datum, vsn) do
       [] ->
         {op, vsn}
+
       conflicting_ops ->
         new_vsn =
           conflicting_ops
-          |> Enum.max_by(&(elem(&1, 1)))
+          |> Enum.max_by(&elem(&1, 1))
           |> elem(1)
           |> Kernel.+(1)
 
@@ -96,6 +97,7 @@ defmodule OT.Server.Impl do
     case type.apply(Map.get(datum, :content), op) do
       {:ok, content} ->
         @adapter.update_datum(datum, content)
+
       err ->
         err
     end

@@ -17,10 +17,12 @@ defmodule OT.Server do
   - `content`: The contents of the datum that `t:operation/0`s will be applied
     to.
   """
-  @type datum :: %{required(:type) => String.t,
-    required(:version) => non_neg_integer,
-    required(:content) => any,
-    any => any}
+  @type datum :: %{
+          required(:type) => String.t(),
+          required(:version) => non_neg_integer,
+          required(:content) => any,
+          any => any
+        }
 
   @typedoc """
   A piece of information that can uniquely identify a `t:datum/0`.
@@ -65,8 +67,8 @@ defmodule OT.Server do
   If the operation succeeds, a tuple will be returned with the operation and
   its version. Otherwise, an error will be returned.
   """
-  @spec submit_operation(pid, any, {OT.Operation.t, pos_integer}, any) ::
-    {:ok, {OT.Operation.t, pos_integer}} | {:error, any}
+  @spec submit_operation(pid, any, {OT.Operation.t(), pos_integer}, any) ::
+          {:ok, {OT.Operation.t(), pos_integer}} | {:error, any}
   def submit_operation(pid, datum_id, {op, vsn}, meta \\ nil) do
     GenServer.call(pid, {:submit_operation, datum_id, {op, vsn}, meta})
   end
