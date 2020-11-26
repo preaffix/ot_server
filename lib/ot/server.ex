@@ -50,6 +50,12 @@ defmodule OT.Server do
     GenServer.start_link(__MODULE__, [])
   end
 
+  @doc false
+  @impl true
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
+
   @doc """
   Submit an operation.
 
